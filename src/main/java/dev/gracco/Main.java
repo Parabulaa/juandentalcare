@@ -1,8 +1,17 @@
 package dev.gracco;
 
-public class Main {
-    public static void main(String[] args) {
+import dev.gracco.db.Database;
+import dev.gracco.ui.Theme;
+import dev.gracco.ui.screen.LoginScreen;
+import lombok.Getter;
 
-        System.out.println("Hello and welcome!");
+import javax.swing.SwingUtilities;
+
+public class Main {
+    @Getter private static final String name = "JuanDentalCare";
+    public static void main(String[] args) {
+        System.out.println("Theme initialized: " + Theme.initialize());
+        System.out.println("Database initialized: " + Database.initialize());
+        SwingUtilities.invokeLater(LoginScreen::new);
     }
 }
