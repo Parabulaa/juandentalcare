@@ -1,9 +1,13 @@
 package dev.gracco.ui;
 
 import lombok.Getter;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.image.ImageTranscoder;
 
+import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.EnumMap;
 import java.util.Map;
@@ -51,6 +55,9 @@ public class Theme {
     public static final Color WHITE = new Color(255, 255, 255);
     public static final Color BLACK = new Color(0, 0, 0);
 
+    @Getter public static ImageIcon burger;
+
+
     //Fonts
     private static final Map<FontType, Font> FONT_CACHE = new EnumMap<>(FontType.class);
     private static boolean initialized = false;
@@ -63,10 +70,50 @@ public class Theme {
         return base.deriveFont(size);
     }
 
+    // Images
+    public static ImageIcon loadSvgImage(String resourcePath, int width, int height) {
+        try (InputStream inputStream =
+                     Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath)) {
+
+            if (inputStream == null) {
+                throw new RuntimeException("Resource not found: " + resourcePath);
+            }
+
+            class SvgTranscoder extends ImageTranscoder {
+                private BufferedImage image;
+
+                @Override
+                public BufferedImage createImage(int w, int h) {
+                    return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                }
+
+                @Override
+                public void writeImage(BufferedImage img, org.apache.batik.transcoder.TranscoderOutput output) {
+                    this.image = img;
+                }
+
+                public BufferedImage getImage() {
+                    return image;
+                }
+            }
+
+            SvgTranscoder transcoder = new SvgTranscoder();
+            transcoder.addTranscodingHint(ImageTranscoder.KEY_WIDTH, (float) width);
+            transcoder.addTranscodingHint(ImageTranscoder.KEY_HEIGHT, (float) height);
+            transcoder.transcode(new TranscoderInput(inputStream), null);
+
+            return new ImageIcon(transcoder.getImage());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load SVG: " + resourcePath, e);
+        }
+    }
+
     //Initialization
     public static boolean initialize() {
         if (initialized) return true;
 
+        //Fonts
         for (FontType type : FontType.values()) {
             try {
                 InputStream is = Theme.class.getResourceAsStream("/fonts/" + type.getFileName());
@@ -76,6 +123,9 @@ public class Theme {
                 return false;
             }
         }
+
+        //Images
+        burger = loadSvgImage("svg/burger.svg", 30, 30);
 
         initialized = true;
         return true;

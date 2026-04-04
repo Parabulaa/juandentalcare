@@ -21,7 +21,7 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:1.18.44")
 
     //Batik Transcoder (svg)
-    implementation 'org.apache.xmlgraphics:batik-transcoder:1.17'
+    implementation 'org.apache.xmlgraphics:batik-transcoder:1.19'
 }
 
 test {

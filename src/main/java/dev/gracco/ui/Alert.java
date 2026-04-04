@@ -16,8 +16,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 
 public final class Alert {
-    private Alert() {
-    }
 
     public static void success(String m, JFrame currentWindow) {
         show(m, currentWindow, "Success", new Color(34, 139, 34), new Color(232, 245, 233));

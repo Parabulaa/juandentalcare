@@ -2,15 +2,20 @@ package dev.gracco.ui.screen;
 
 import dev.gracco.Main;
 import dev.gracco.ui.Theme;
+import dev.gracco.ui.panels.FirstPanel;
+import dev.gracco.ui.panels.SecondPanel;
+import dev.gracco.ui.panels.ThirdPanel;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -21,8 +26,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MainScreen extends JFrame {
-    private static final int EXPANDED_SIDEBAR_WIDTH = 260;
-    private static final int COLLAPSED_SIDEBAR_WIDTH = 70;
+    private static final int EXPANDED_SIDEBAR_WIDTH = 320;
+    private static final int COLLAPSED_SIDEBAR_WIDTH = 100;
     private static final int MIN_WINDOW_WIDTH = 1280;
     private static final int MIN_WINDOW_HEIGHT = 720;
 
@@ -39,8 +44,13 @@ public class MainScreen extends JFrame {
     private boolean sidebarExpanded = true;
     private String selectedPanel = "One";
 
+    private static final int SIDEBAR_ANIMATION_DURATION = 220;
+    private static final int SIDEBAR_ANIMATION_STEP_DELAY = 10;
+
+    private boolean sidebarAnimating = false;
+
     public MainScreen() {
-        setTitle("MainScreen");
+        setTitle(Main.getName());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT));
         setSize(1280, 720);
@@ -60,12 +70,13 @@ public class MainScreen extends JFrame {
         titleLabel = new JLabel(Main.getName());
         titleLabel.setForeground(Theme.BLACK);
         titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        titleLabel.setFont(Theme.getFont(Theme.FontType.SEMI_BOLD, 24));
 
-        toggleButton = new JLabel("≡");
-        toggleButton.setForeground(Theme.BLACK);
+        toggleButton = new JLabel(Theme.getBurger());
         toggleButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         toggleButton.setHorizontalAlignment(SwingConstants.CENTER);
-        toggleButton.setPreferredSize(new Dimension(44, 36));
+        toggleButton.setVerticalAlignment(SwingConstants.CENTER);
+        toggleButton.setPreferredSize(new Dimension(48, 48));
 
         toggleButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -104,9 +115,9 @@ public class MainScreen extends JFrame {
         contentPanel.setBackground(Theme.WHITE);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        contentPanel.add(createContentPanel("One"), "One");
-        contentPanel.add(createContentPanel("Two"), "Two");
-        contentPanel.add(createContentPanel("Three"), "Three");
+        contentPanel.add(new FirstPanel(), "One");
+        contentPanel.add(new SecondPanel(), "Two");
+        contentPanel.add(new ThirdPanel(), "Three");
 
         add(sidebar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
@@ -122,38 +133,30 @@ public class MainScreen extends JFrame {
         button.setPreferredSize(new Dimension(0, 48));
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
         button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setVerticalTextPosition(SwingConstants.CENTER);
+        button.setHorizontalTextPosition(SwingConstants.RIGHT);
+        button.setIconTextGap(12);
+
         button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(true);
+        button.setContentAreaFilled(false);
+        button.setOpaque(true);
+
         button.setForeground(Theme.BLACK);
         button.setBackground(Theme.WHITE);
-        addHoverColor(button, Theme.HIGHLIGHT);
+        button.setFont(Theme.getFont(Theme.FontType.MEDIUM, 14));
+
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         button.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 4, 0, 0, Theme.SECONDARY),
                 BorderFactory.createEmptyBorder(0, 14, 0, 14)
         ));
+
         button.setBorderPainted(true);
+
+        addHoverColor(button);
+
         return button;
-    }
-
-    private JPanel createContentPanel(String text) {
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setBackground(Theme.WHITE);
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Theme.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24)
-        );
-
-        JLabel label = new JLabel(text);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setForeground(Theme.BLACK);
-
-        panel.add(label, BorderLayout.CENTER);
-        wrapper.add(panel, BorderLayout.CENTER);
-
-        return wrapper;
     }
 
     private void showPanel(String panelName) {
@@ -163,14 +166,23 @@ public class MainScreen extends JFrame {
     }
 
     private void updateSidebarSelection() {
-        styleSidebarButton(oneButton, selectedPanel.equals("One"), "One", "1");
-        styleSidebarButton(twoButton, selectedPanel.equals("Two"), "Two", "2");
-        styleSidebarButton(threeButton, selectedPanel.equals("Three"), "Three", "3");
+        styleSidebarButton(oneButton, selectedPanel.equals("One"), "One", Theme.getBurger());
+        styleSidebarButton(twoButton, selectedPanel.equals("Two"), "Two", Theme.getBurger());
+        styleSidebarButton(threeButton, selectedPanel.equals("Three"), "Three", Theme.getBurger());
     }
 
-    private void styleSidebarButton(JButton button, boolean selected, String expandedText, String collapsedText) {
-        button.setText(sidebarExpanded ? expandedText : collapsedText);
-        button.setHorizontalAlignment(sidebarExpanded ? SwingConstants.LEFT : SwingConstants.CENTER);
+    private void styleSidebarButton(JButton button, boolean selected, String expandedText, Icon collapsedIcon) {
+        if (sidebarExpanded) {
+            button.setText(expandedText);
+            button.setIcon(null);
+            button.setHorizontalAlignment(SwingConstants.LEFT);
+        } else {
+            button.setText("");
+            button.setIcon(collapsedIcon);
+            button.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+
+        button.putClientProperty("selected", selected);
 
         if (selected) {
             button.setBackground(Theme.SECONDARY);
@@ -182,45 +194,72 @@ public class MainScreen extends JFrame {
     }
 
     private void toggleSidebar() {
-        sidebarExpanded = !sidebarExpanded;
-        sidebar.setPreferredSize(new Dimension(sidebarExpanded ? EXPANDED_SIDEBAR_WIDTH : COLLAPSED_SIDEBAR_WIDTH, 0));
-        titleLabel.setText(sidebarExpanded ? Main.getName() : "");
-        updateSidebarSelection();
-        revalidate();
-        repaint();
+        if (sidebarAnimating) return;
+
+        sidebarAnimating = true;
+        toggleButton.setEnabled(false);
+
+        int startWidth = sidebar.getPreferredSize().width;
+        int targetWidth = sidebarExpanded ? COLLAPSED_SIDEBAR_WIDTH : EXPANDED_SIDEBAR_WIDTH;
+
+        if (!sidebarExpanded) {
+            titleLabel.setText(Main.getName());
+        }
+
+        int distance = targetWidth - startWidth;
+        int steps = Math.max(1, SIDEBAR_ANIMATION_DURATION / SIDEBAR_ANIMATION_STEP_DELAY);
+
+        Timer timer = new Timer(SIDEBAR_ANIMATION_STEP_DELAY, null);
+        final int[] currentStep = {0};
+
+        timer.addActionListener(e -> {
+            currentStep[0]++;
+            float progress = Math.min((float) currentStep[0] / steps, 1f);
+
+            int newWidth = startWidth + Math.round(distance * progress);
+
+            sidebar.setPreferredSize(new Dimension(newWidth, 0));
+            sidebar.revalidate();
+            revalidate();
+            repaint();
+
+            if (progress >= 1f) {
+                timer.stop();
+
+                sidebarExpanded = !sidebarExpanded;
+
+                if (!sidebarExpanded) titleLabel.setText("");
+
+                updateSidebarSelection();
+                sidebarAnimating = false;
+                toggleButton.setEnabled(true);
+            }
+        });
+
+        timer.setRepeats(true);
+        timer.start();
     }
 
-    private void addHoverColor(JButton button, Color highlight) {
+    private void addHoverColor(JButton button) {
         button.addMouseListener(new MouseAdapter() {
-            boolean notHovered = true;
-            Color background = null;
-            Color foreground = null;
-
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (notHovered) {
-                    foreground = button.getForeground();
-                    background = button.getBackground();
-                    notHovered = false;
+                boolean selected = Boolean.TRUE.equals(button.getClientProperty("selected"));
+
+                if (!selected) {
+                    button.setBackground(Theme.HIGHLIGHT);
+                    button.setForeground(Theme.BLACK);
                 }
-                button.setBackground(highlight);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (!notHovered) {
-                    button.setBackground(background);
-                    background = null;
+                boolean selected = Boolean.TRUE.equals(button.getClientProperty("selected"));
 
-                    button.setForeground(foreground);
-                    foreground = null;
-                    notHovered = true;
+                if (!selected) {
+                    button.setBackground(Theme.WHITE);
+                    button.setForeground(Theme.BLACK);
                 }
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                notHovered = true;
             }
         });
     }
