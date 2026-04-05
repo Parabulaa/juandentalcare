@@ -7,12 +7,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 
-public class ThirdPanel extends JPanel {
-    public ThirdPanel() {
+public class AppointmentPanel extends JPanel {
+    public AppointmentPanel() {
         setLayout(new BorderLayout());
         setBackground(Theme.WHITE);
 
-        JLabel label = new JLabel("Three");
+        JLabel label = new JLabel("Two");
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Theme.BLACK);
 

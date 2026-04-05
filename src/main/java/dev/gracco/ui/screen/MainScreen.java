@@ -2,9 +2,9 @@ package dev.gracco.ui.screen;
 
 import dev.gracco.Main;
 import dev.gracco.ui.Theme;
-import dev.gracco.ui.panels.FirstPanel;
-import dev.gracco.ui.panels.SecondPanel;
-import dev.gracco.ui.panels.ThirdPanel;
+import dev.gracco.ui.panels.DashboardPanel;
+import dev.gracco.ui.panels.AppointmentPanel;
+import dev.gracco.ui.panels.PatientPanel;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -18,7 +18,6 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -37,12 +36,12 @@ public class MainScreen extends JFrame {
     private final JLabel titleLabel;
     private final CardLayout cardLayout;
 
-    private final JButton oneButton;
-    private final JButton twoButton;
-    private final JButton threeButton;
+    private final JButton dashboardButton;
+    private final JButton appointmentButton;
+    private final JButton patientButton;
 
     private boolean sidebarExpanded = true;
-    private String selectedPanel = "One";
+    private String selectedPanel = "Dashboard";
 
     private static final int SIDEBAR_ANIMATION_DURATION = 220;
     private static final int SIDEBAR_ANIMATION_STEP_DELAY = 10;
@@ -72,9 +71,9 @@ public class MainScreen extends JFrame {
         titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
         titleLabel.setFont(Theme.getFont(Theme.FontType.SEMI_BOLD, 24));
 
-        toggleButton = new JLabel(Theme.getBurger());
+        toggleButton = new JLabel(Theme.getSidebarClose());
         toggleButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        toggleButton.setHorizontalAlignment(SwingConstants.CENTER);
+        toggleButton.setHorizontalAlignment(SwingConstants.RIGHT);
         toggleButton.setVerticalAlignment(SwingConstants.CENTER);
         toggleButton.setPreferredSize(new Dimension(48, 48));
 
@@ -93,19 +92,19 @@ public class MainScreen extends JFrame {
         sidebarCenter.setLayout(new BoxLayout(sidebarCenter, BoxLayout.Y_AXIS));
         sidebarCenter.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
 
-        oneButton = createSidebarButton("One");
-        twoButton = createSidebarButton("Two");
-        threeButton = createSidebarButton("Three");
+        dashboardButton = createSidebarButton("Dashboard");
+        appointmentButton = createSidebarButton("Appointments");
+        patientButton = createSidebarButton("Patients");
 
-        oneButton.addActionListener(e -> showPanel("One"));
-        twoButton.addActionListener(e -> showPanel("Two"));
-        threeButton.addActionListener(e -> showPanel("Three"));
+        dashboardButton.addActionListener(e -> showPanel("Dashboard"));
+        appointmentButton.addActionListener(e -> showPanel("Appointments"));
+        patientButton.addActionListener(e -> showPanel("Patients"));
 
-        sidebarCenter.add(oneButton);
+        sidebarCenter.add(dashboardButton);
         sidebarCenter.add(Box.createVerticalStrut(10));
-        sidebarCenter.add(twoButton);
+        sidebarCenter.add(appointmentButton);
         sidebarCenter.add(Box.createVerticalStrut(10));
-        sidebarCenter.add(threeButton);
+        sidebarCenter.add(patientButton);
 
         sidebar.add(sidebarTop, BorderLayout.NORTH);
         sidebar.add(sidebarCenter, BorderLayout.CENTER);
@@ -115,14 +114,14 @@ public class MainScreen extends JFrame {
         contentPanel.setBackground(Theme.WHITE);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        contentPanel.add(new FirstPanel(), "One");
-        contentPanel.add(new SecondPanel(), "Two");
-        contentPanel.add(new ThirdPanel(), "Three");
+        contentPanel.add(new DashboardPanel(), "Dashboard");
+        contentPanel.add(new AppointmentPanel(), "Appointments");
+        contentPanel.add(new PatientPanel(), "Patients");
 
         add(sidebar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
-        showPanel("One");
+        showPanel("Dashboard");
 
         setVisible(true);
     }
@@ -132,6 +131,7 @@ public class MainScreen extends JFrame {
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 48));
         button.setPreferredSize(new Dimension(0, 48));
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setVerticalTextPosition(SwingConstants.CENTER);
         button.setHorizontalTextPosition(SwingConstants.RIGHT);
@@ -166,21 +166,34 @@ public class MainScreen extends JFrame {
     }
 
     private void updateSidebarSelection() {
-        styleSidebarButton(oneButton, selectedPanel.equals("One"), "One", Theme.getBurger());
-        styleSidebarButton(twoButton, selectedPanel.equals("Two"), "Two", Theme.getBurger());
-        styleSidebarButton(threeButton, selectedPanel.equals("Three"), "Three", Theme.getBurger());
+        styleSidebarButton(dashboardButton, selectedPanel.equals("Dashboard"), "Dashboard",
+                Theme.getDashboardColor(), Theme.getDashboardWhite());
+
+        styleSidebarButton(appointmentButton, selectedPanel.equals("Appointments"), "Appointments",
+                Theme.getAppointmentColor(), Theme.getAppointmentWhite());
+
+        styleSidebarButton(patientButton, selectedPanel.equals("Patients"), "Patients",
+                Theme.getPatientColor(), Theme.getPatientWhite());
     }
 
-    private void styleSidebarButton(JButton button, boolean selected, String expandedText, Icon collapsedIcon) {
-        if (sidebarExpanded) {
+    private void styleSidebarButton(JButton button, boolean selected, String expandedText,
+                                    Icon normalIcon, Icon whiteIcon) {
+
+        button.setIcon(selected ? whiteIcon : normalIcon);
+
+        int currentWidth = sidebar.getPreferredSize().width;
+        boolean showText = currentWidth > 180;
+
+        if (showText) {
             button.setText(expandedText);
-            button.setIcon(null);
-            button.setHorizontalAlignment(SwingConstants.LEFT);
+            button.setIconTextGap(12);
         } else {
             button.setText("");
-            button.setIcon(collapsedIcon);
-            button.setHorizontalAlignment(SwingConstants.CENTER);
+            button.setIconTextGap(0);
         }
+
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setHorizontalTextPosition(SwingConstants.RIGHT);
 
         button.putClientProperty("selected", selected);
 
@@ -219,6 +232,9 @@ public class MainScreen extends JFrame {
             int newWidth = startWidth + Math.round(distance * progress);
 
             sidebar.setPreferredSize(new Dimension(newWidth, 0));
+
+            updateSidebarSelection();
+
             sidebar.revalidate();
             revalidate();
             repaint();
@@ -228,7 +244,12 @@ public class MainScreen extends JFrame {
 
                 sidebarExpanded = !sidebarExpanded;
 
-                if (!sidebarExpanded) titleLabel.setText("");
+                if (!sidebarExpanded) {
+                    titleLabel.setText("");
+                    toggleButton.setIcon(Theme.getSidebarOpen());
+                } else {
+                    toggleButton.setIcon(Theme.getSidebarClose());
+                }
 
                 updateSidebarSelection();
                 sidebarAnimating = false;

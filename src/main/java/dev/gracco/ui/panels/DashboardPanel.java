@@ -7,12 +7,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 
-public class SecondPanel extends JPanel {
-    public SecondPanel() {
+public class DashboardPanel extends JPanel {
+    public DashboardPanel() {
         setLayout(new BorderLayout());
         setBackground(Theme.WHITE);
 
-        JLabel label = new JLabel("Two");
+        JLabel label = new JLabel("One");
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Theme.BLACK);
 

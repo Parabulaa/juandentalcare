@@ -55,8 +55,16 @@ public class Theme {
     public static final Color WHITE = new Color(255, 255, 255);
     public static final Color BLACK = new Color(0, 0, 0);
 
-    @Getter public static ImageIcon burger;
-
+    @Getter private static ImageIcon adminWhite;
+    @Getter private static ImageIcon adminColor;
+    @Getter private static ImageIcon appointmentWhite;
+    @Getter private static ImageIcon appointmentColor;
+    @Getter private static ImageIcon dashboardWhite;
+    @Getter private static ImageIcon dashboardColor;
+    @Getter private static ImageIcon patientWhite;
+    @Getter private static ImageIcon patientColor;
+    @Getter private static ImageIcon sidebarOpen;
+    @Getter private static ImageIcon sidebarClose;
 
     //Fonts
     private static final Map<FontType, Font> FONT_CACHE = new EnumMap<>(FontType.class);
@@ -125,7 +133,16 @@ public class Theme {
         }
 
         //Images
-        burger = loadSvgImage("svg/burger.svg", 30, 30);
+        adminWhite = loadSvgImage("svg/admin_white.svg", 30, 30);
+        adminColor = loadSvgImage("svg/admin_color.svg", 30, 30);
+        appointmentWhite = loadSvgImage("svg/appointment_white.svg", 30, 30);
+        appointmentColor = loadSvgImage("svg/appointment_color.svg", 30, 30);
+        dashboardWhite = loadSvgImage("svg/dashboard_white.svg", 30, 30);
+        dashboardColor = loadSvgImage("svg/dashboard_color.svg", 30, 30);
+        patientWhite = loadSvgImage("svg/patient_white.svg", 30, 30);
+        patientColor = loadSvgImage("svg/patient_color.svg", 30, 30);
+        sidebarOpen = loadSvgImage("svg/sidebar_open.svg", 30, 30);
+        sidebarClose = loadSvgImage("svg/sidebar_close.svg", 30, 30);
 
         initialized = true;
         return true;
