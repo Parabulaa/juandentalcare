@@ -1,6 +1,8 @@
 package dev.gracco.db;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -9,8 +11,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
-    private static final Log log = LogFactory.getLog(Database.class);
-    private static Connection connection;
+    @Getter(AccessLevel.PROTECTED) private static Connection connection;
 
     public static boolean initialize() {
         Dotenv dotenv = Dotenv.load();
@@ -21,7 +22,7 @@ public class Database {
         try {
             connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Error with database: " + e.getMessage());
             return false;
         }
 

@@ -1,6 +1,8 @@
 package dev.gracco.ui.screen;
 
 import dev.gracco.Main;
+import dev.gracco.db.Enums;
+import dev.gracco.db.User;
 import dev.gracco.ui.Theme;
 import dev.gracco.ui.panels.AdminPanel;
 import dev.gracco.ui.panels.AppointmentPanel;
@@ -32,7 +34,6 @@ public class MainScreen extends JFrame {
     private static final int MIN_WINDOW_WIDTH = 1280;
     private static final int MIN_WINDOW_HEIGHT = 720;
     private static final int SIDEBAR_BUTTON_HEIGHT = 64;
-    private static final boolean INSERT_HERE_THE_BOOLEAN = true;
 
     private final JPanel sidebar;
     private final JPanel contentPanel;
@@ -43,8 +44,8 @@ public class MainScreen extends JFrame {
     private final JButton dashboardButton;
     private final JButton appointmentButton;
     private final JButton patientButton;
-    private final JButton adminButton;
-    private final JButton logsButton;
+    private JButton adminButton;
+    private JButton logsButton;
 
     private boolean sidebarExpanded = true;
     private String selectedPanel = "Dashboard";
@@ -112,7 +113,7 @@ public class MainScreen extends JFrame {
         sidebarCenter.add(Box.createVerticalStrut(12));
         sidebarCenter.add(patientButton);
 
-        if (INSERT_HERE_THE_BOOLEAN) {
+        if (User.getRole() == Enums.Role.ADMIN) {
             adminButton = createSidebarButton("Admin");
             logsButton = createSidebarButton("Logs");
 
@@ -137,7 +138,7 @@ public class MainScreen extends JFrame {
         contentPanel.add(new AppointmentPanel(), "Appointments");
         contentPanel.add(new PatientPanel(), "Patients");
 
-        if (INSERT_HERE_THE_BOOLEAN) {
+        if (User.getRole() == Enums.Role.ADMIN) {
             contentPanel.add(new AdminPanel(), "Admin");
             contentPanel.add(new LogsPanel(), "Logs");
         }
@@ -198,7 +199,7 @@ public class MainScreen extends JFrame {
         styleSidebarButton(patientButton, selectedPanel.equals("Patients"), "Patients",
                 Theme.getPatientColor(), Theme.getPatientWhite());
 
-        if (INSERT_HERE_THE_BOOLEAN) {
+        if (User.getRole() == Enums.Role.ADMIN) {
             styleSidebarButton(adminButton, selectedPanel.equals("Admin"), "Admin",
                     Theme.getAdminColor(), Theme.getAdminWhite());
             styleSidebarButton(logsButton, selectedPanel.equals("Logs"), "Logs",

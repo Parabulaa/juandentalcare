@@ -1,6 +1,8 @@
 package dev.gracco.ui.screen;
 
 import dev.gracco.Main;
+import dev.gracco.db.User;
+import dev.gracco.ui.Alert;
 import dev.gracco.ui.Theme;
 import dev.gracco.ui.element.JRoundedButton;
 import dev.gracco.ui.element.JRoundedPanel;
@@ -38,7 +40,7 @@ public class LoginScreen extends JFrame {
         card.setBorder(new EmptyBorder(20, 30, 30, 30));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Theme.WHITE);
-        card.setPreferredSize(new Dimension(300, 380));
+        card.setPreferredSize(new Dimension(300, 360));
 
         Dimension fieldSize = new Dimension(240, 42);
 
@@ -105,15 +107,14 @@ public class LoginScreen extends JFrame {
         });
 
         loginButton.addActionListener(_ -> {
-            SwingUtilities.invokeLater(MainScreen::new);
-            this.dispose();
+            String result = User.login(usernameField.getText(), new String(passwordField.getPassword()));
+            if (result != null) {
+                Alert.error(result, this);
+            } else {
+                SwingUtilities.invokeLater(MainScreen::new);
+                this.dispose();
+            }
         });
-
-        JLabel footer = new JLabel("Forgot password?");
-        footer.setFont(Theme.getFont(Theme.FontType.LIGHT, 13));
-        footer.setForeground(Theme.BLACK);
-        footer.setAlignmentX(Component.CENTER_ALIGNMENT);
-        footer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         // How to add button action listener
         // button.addActionListener(e -> {
@@ -140,7 +141,6 @@ public class LoginScreen extends JFrame {
         card.add(Box.createVerticalStrut(18));
         card.add(loginButton);
         card.add(Box.createVerticalStrut(8));
-        card.add(footer);
 
         root.add(card);
         setContentPane(root);

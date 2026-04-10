@@ -28,6 +28,9 @@ dependencies {
 
     //Java dotenv
     implementation 'io.github.cdimascio:dotenv-java:3.2.0'
+
+    //Apache Commons Text
+    implementation("org.apache.commons:commons-text:1.15.0")
 }
 
 test {
