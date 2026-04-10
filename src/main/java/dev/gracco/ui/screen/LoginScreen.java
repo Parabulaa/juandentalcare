@@ -111,8 +111,9 @@ public class LoginScreen extends JFrame {
             if (result != null) {
                 Alert.error(result, this);
             } else {
-                SwingUtilities.invokeLater(MainScreen::new);
                 this.dispose();
+                if (!User.isChangedPassword()) SwingUtilities.invokeLater(ChangePasswordScreen::new);
+                else SwingUtilities.invokeLater(MainScreen::new);
             }
         });
 

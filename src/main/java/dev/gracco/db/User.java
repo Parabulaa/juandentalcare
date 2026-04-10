@@ -4,7 +4,6 @@ import dev.gracco.ui.Alert;
 import lombok.Getter;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class User {
@@ -30,7 +29,7 @@ public class User {
         try (PreparedStatement statement = Database.getConnection().prepareStatement(sql)) {
             statement.setString(1, usernameInput);
 
-            try (ResultSet resultSet = statement.executeQuery()) {
+            try (var resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
                     return "User does not exist";
                 }
@@ -58,6 +57,43 @@ public class User {
         } catch (SQLException e) {
             Alert.fatalError(e.getMessage());
             return null;
+        }
+    }
+
+    public static boolean changePassword(String newPassword) {
+        if (newPassword == null || newPassword.isBlank()) {
+            Alert.fatalError("Password cannot be empty.");
+        }
+
+        String sql = """
+                UPDATE users
+                SET password_hash = ?, changed_pass = TRUE
+                WHERE user_id = ?
+                """;
+
+        try (PreparedStatement statement = Database.getConnection().prepareStatement(sql)) {
+            statement.setString(1, Encryption.encrypt(newPassword));
+            statement.setInt(2, userId);
+
+            int rowsUpdated = statement.executeUpdate();
+
+            if (rowsUpdated == 0) {
+                return false;
+            }
+
+            changedPassword = true;
+
+            Logs.logToDatabase(
+                    Enums.ActionType.UPDATE,
+                    "users",
+                    userId,
+                    "User changed their password"
+            );
+
+            return true;
+        } catch (SQLException e) {
+            Alert.fatalError(e.getMessage());
+            return false;
         }
     }
 }
