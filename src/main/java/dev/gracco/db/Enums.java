@@ -4,7 +4,7 @@ import org.apache.commons.text.WordUtils;
 
 public class Enums {
     public enum ActionType {
-        CREATE, UPDATE, DELETE, LOGIN, LOGOUT;
+        CREATE, UPDATE, DELETE;
     }
 
     public enum Role {
@@ -47,5 +47,9 @@ public class Enums {
         public String toString() {
             return value;
         }
+    }
+
+    public enum Tables {
+        APPOINTMENTS, PATIENTS, USERS
     }
 }

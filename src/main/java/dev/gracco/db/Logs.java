@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Logs {
-    public static void logToDatabase(Enums.ActionType actionType, String tableName, Integer recordId, String description) {
+    public static void logToDatabase(Enums.ActionType actionType, Enums.Tables tableName, Integer recordId, String description) {
         String sql = """
                 INSERT INTO activity_logs (user_id, action_type, table_name, record_id, action_description)
                 VALUES (?, ?, ?, ?, ?)
@@ -16,7 +16,7 @@ public class Logs {
         try (PreparedStatement statement = Database.getConnection().prepareStatement(sql)) {
             statement.setInt(1, User.getUserId());
             statement.setString(2, actionType.name());
-            statement.setString(3, tableName);
+            statement.setString(3, tableName.name());
 
             if (recordId == null) {
                 statement.setNull(4, java.sql.Types.INTEGER);
