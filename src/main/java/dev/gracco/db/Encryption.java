@@ -6,7 +6,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.util.regex.Pattern;
 
 public class Encryption {
     /**

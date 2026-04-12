@@ -4,8 +4,6 @@ import dev.gracco.ui.Alert;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
